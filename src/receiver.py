@@ -81,8 +81,6 @@ def lambda_handler(event, context):
                 headers={"Content-Type": "application/json"},
             )
             slack_response = urllib.request.urlopen(slack_request)
-
-            # Slack notification
         else:
             client.send_task_failure(
                 error="ManualRejection",

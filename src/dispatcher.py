@@ -30,7 +30,6 @@ def lambda_handler(event, context):
         "state_machine_name": event["state_machine_id"].split(":")[6],
     }
 
-
     link = f"{api_url}?{urllib.parse.urlencode(params)}"
     approve_link = f"{link}&action=approve"
     reject_link = f"{link}&action=reject"
