@@ -31,7 +31,8 @@ resource "aws_lambda_function" "receiver" {
       SLACK_WEBHOOK_URL            = jsonencode(var.slack_webhook_url)
     }
   }
-  tags = var.tags
+  timeout = var.lambda_timeout
+  tags    = var.tags
 }
 
 resource "aws_lambda_function" "dispatcher" {
@@ -47,7 +48,8 @@ resource "aws_lambda_function" "dispatcher" {
       SLACK_WEBHOOK_URL = var.slack_webhook_url
     }
   }
-  tags = var.tags
+  timeout = var.lambda_timeout
+  tags    = var.tags
 }
 
 resource "aws_iam_role" "dispatcher" {

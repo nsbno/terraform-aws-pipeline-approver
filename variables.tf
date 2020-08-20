@@ -23,3 +23,8 @@ variable "slack_webhook_url" {
   description = "The URL of a Slack webhook to post messages to."
   type        = string
 }
+
+variable "lambda_timeout" {
+  description = "The maximum number of seconds the Lambda functions are allowed to run."
+  default     = 30
+}
