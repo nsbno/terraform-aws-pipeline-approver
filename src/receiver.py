@@ -24,6 +24,9 @@ def lambda_handler(event, context):
     account_id = event["requestContext"]["accountId"]
     region = os.environ["AWS_REGION"]
     slack_webhook_url = os.environ["SLACK_WEBHOOK_URL"]
+    wait_for_previous_executions = json.loads(
+        os.environ["WAIT_FOR_PREVIOUS_EXECUTIONS"]
+    )
     required_params = [
         "token",
         "action",
@@ -47,6 +50,53 @@ def lambda_handler(event, context):
 
     client = boto3.client("stepfunctions")
     try:
+        if wait_for_previous_executions:
+            executions = client.list_executions(
+                stateMachineArn=state_machine_arn, maxResults=500
+            )
+            current_execution = next(
+                (
+                    execution
+                    for execution in executions
+                    if execution["executionArn"] == execution_arn
+                ),
+                None,
+            )
+            if not current_execution:
+                logger.error(
+                    "Could not find execution with ARN '%s' when querying the API",
+                    execution_arn,
+                )
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps(
+                        {
+                            "message": f"An execution with ARN '{execution_arn}' does not exist"
+                        }
+                    ),
+                }
+
+            running_executions = list(
+                filter(
+                    lambda execution: execution["status"] == "RUNNING"
+                    and execution["startDate"]
+                    < current_execution["startDate"],
+                    executions,
+                )
+            )
+            if len(running_executions):
+                logger.error(
+                    "Can not send approve/reject task until previous executions have finished"
+                )
+                return {
+                    "statusCode": 400,
+                    "body": json.dumps(
+                        {
+                            "message": "Can not approve/reject task until previous executions have finished"
+                        }
+                    ),
+                }
+
         if params["action"] == "approve":
             client.send_task_success(
                 taskToken=params["token"], output=json.dumps({})
