@@ -27,8 +27,8 @@ resource "aws_lambda_function" "receiver" {
   source_code_hash = filebase64sha256(data.archive_file.receiver.output_path)
   environment {
     variables = {
-      WAIT_FOR_PREVIOUS_EXECUTIONS = var.wait_for_previous_executions
-      SLACK_WEBHOOK_URL            = jsonencode(var.slack_webhook_url)
+      SLACK_WEBHOOK_URL            = var.slack_webhook_url
+      WAIT_FOR_PREVIOUS_EXECUTIONS = jsonencode(var.wait_for_previous_executions)
     }
   }
   timeout = var.lambda_timeout
