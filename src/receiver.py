@@ -53,7 +53,7 @@ def lambda_handler(event, context):
         if wait_for_previous_executions:
             executions = client.list_executions(
                 stateMachineArn=state_machine_arn, maxResults=500
-            )
+            )["executions"]
             current_execution = next(
                 (
                     execution
