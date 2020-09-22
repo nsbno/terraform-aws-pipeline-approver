@@ -27,10 +27,12 @@ resource "aws_lambda_function" "receiver" {
   source_code_hash = filebase64sha256(data.archive_file.receiver.output_path)
   environment {
     variables = {
-      SLACK_WEBHOOK_URL = var.slack_webhook_url
+      SLACK_WEBHOOK_URL            = var.slack_webhook_url
+      WAIT_FOR_PREVIOUS_EXECUTIONS = jsonencode(var.wait_for_previous_executions)
     }
   }
-  tags = var.tags
+  timeout = var.lambda_timeout
+  tags    = var.tags
 }
 
 resource "aws_lambda_function" "dispatcher" {
@@ -46,7 +48,8 @@ resource "aws_lambda_function" "dispatcher" {
       SLACK_WEBHOOK_URL = var.slack_webhook_url
     }
   }
-  tags = var.tags
+  timeout = var.lambda_timeout
+  tags    = var.tags
 }
 
 resource "aws_iam_role" "dispatcher" {
@@ -69,8 +72,8 @@ resource "aws_iam_role_policy" "logs_to_receiver" {
   role   = aws_iam_role.receiver.id
 }
 
-resource "aws_iam_role_policy" "task_status_to_receiver" {
-  policy = data.aws_iam_policy_document.task_status_for_lambda.json
+resource "aws_iam_role_policy" "sfn_to_receiver" {
+  policy = data.aws_iam_policy_document.sfn_for_lambda.json
   role   = aws_iam_role.receiver.id
 }
 

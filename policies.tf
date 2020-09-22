@@ -28,10 +28,11 @@ data "aws_iam_policy_document" "logs_for_lambda" {
   }
 }
 
-data "aws_iam_policy_document" "task_status_for_lambda" {
+data "aws_iam_policy_document" "sfn_for_lambda" {
   statement {
     effect = "Allow"
     actions = [
+      "states:ListExecutions",
       "states:SendTaskSuccess",
       "states:SendTaskFailure"
     ]

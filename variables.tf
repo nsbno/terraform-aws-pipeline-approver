@@ -14,7 +14,17 @@ variable "state_machine_arns" {
   type        = list(string)
 }
 
+variable "wait_for_previous_executions" {
+  description = "Whether to allow for task approval/rejection if there are previous executions still running."
+  default     = true
+}
+
 variable "slack_webhook_url" {
   description = "The URL of a Slack webhook to post messages to."
   type        = string
+}
+
+variable "lambda_timeout" {
+  description = "The maximum number of seconds the Lambda functions are allowed to run."
+  default     = 30
 }
